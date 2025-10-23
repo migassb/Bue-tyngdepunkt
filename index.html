@@ -1,12 +1,83 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bue Tyngdepunkt Demo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bue Tyngdepunkt Demo</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.8);
+      padding: 10px;
+      border-radius: 8px;
+      font-family: sans-serif;
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; text-align: center; margin-top: 100px;">
-    <h1>Bue Tyngdepunkt Demo</h1>
-    <p>GitHub Pages virker! 🎯</p>
+<body>
+  <div id="info">
+    <h3>Bue Tyngdepunkt Demo 🎯</h3>
+    <p>Træk med musen for at rotere modellen</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    // Opret scene
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f0f0);
+
+    // Kamera
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1, 4);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lys
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
+
+    // Bue (simpel bue-form)
+    const bueMaterial = new THREE.MeshStandardMaterial({ color: 0x3333ff });
+    const bueGeometry = new THREE.TorusGeometry(1, 0.05, 16, 100, Math.PI);
+    const bue = new THREE.Mesh(bueGeometry, bueMaterial);
+    bue.rotation.x = Math.PI / 2;
+    scene.add(bue);
+
+    // Tyngdepunkt (rød kugle)
+    const kugleGeometry = new THREE.SphereGeometry(0.05, 32, 32);
+    const kugleMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    const tyngdepunkt = new THREE.Mesh(kugleGeometry, kugleMaterial);
+    tyngdepunkt.position.set(0, 0, 0);
+    scene.add(tyngdepunkt);
+
+    // Kontroller (rotering med musen)
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Juster størrelse ved vinduesændring
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
